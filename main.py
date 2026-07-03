@@ -1,8 +1,15 @@
 import os
+import argparse
+
 from dotenv import load_dotenv
 from openai import OpenAI
 
+
 def main():
+    parser = argparse.ArgumentParser(description="Chatbot")
+    parser.add_argument("user_prompt", type=str, help="User prompt")
+    args = parser.parse_args()
+
     load_dotenv()
     
     api_key = os.environ.get("OPENROUTER_API_KEY")
@@ -16,11 +23,15 @@ def main():
     messages = [
         {
             "role": "user",
-            "content": "Why is Boot.dev such a great place to learn backend development? Use one paragraph maximum."
+            "content": args.user_prompt
         }
     ]
-    completion = client.chat.completions.create(model="openrouter/free", messages=messages)
-    print(completion.choices[0].message.content)
+    response = client.chat.completions.create(model="openrouter/free", messages=messages)
+    if response is None: raise Exception("Error! No usage reported by AI model.")
+
+    print(f"Prompt tokens: {response.usage.prompt_tokens}")
+    print(f"Response tokens: {response.usage.completion_tokens}")
+    print(response.choices[0].message.content)
 
 if __name__ == "__main__":
     main()
