@@ -3,6 +3,7 @@ import argparse
 
 from dotenv import load_dotenv
 from openai import OpenAI
+from prompts import SYSTEM_PROMPT
 
 
 def main():
@@ -22,10 +23,8 @@ def main():
     )
 
     messages = [
-        {
-            "role": "user",
-            "content": args.user_prompt
-        }
+        { "role": "system", "content": SYSTEM_PROMPT},
+        { "role": "user", "content": args.user_prompt}
     ]
     response = client.chat.completions.create(model="openrouter/free", messages=messages)
     if response is None: raise Exception("Error! No usage reported by AI model.")
