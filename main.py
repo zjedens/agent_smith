@@ -1,9 +1,11 @@
 import os
 import argparse
+import json
 
 from dotenv import load_dotenv
 from openai import OpenAI
 from prompts import SYSTEM_PROMPT
+from functions.call_function import available_functions
 
 
 def main():
@@ -29,7 +31,8 @@ def main():
     response = client.chat.completions.create(
         model="openrouter/free", 
         messages=messages, 
-        temperature=0
+        temperature=0,
+        tools=available_functions
     )
     if response is None: raise Exception("Error! No usage reported by AI model.")
 
@@ -37,7 +40,15 @@ def main():
         print(f"User prompt: {args.user_prompt}")
         print(f"Prompt tokens: {response.usage.prompt_tokens}")
         print(f"Response tokens: {response.usage.completion_tokens}")
-    print(response.choices[0].message.content)
+
+    msg = response.choices[0].message
+    if msg.tool_calls is not None:
+        for tool_call in msg.tool_calls:
+            func_args = json.loads(tool_call.function.arguments or "{}")
+            print(f"Calling function: {tool_call.function.name}({func_args})")
+    else:
+        print(msg.content)
+
 
 if __name__ == "__main__":
     main()
