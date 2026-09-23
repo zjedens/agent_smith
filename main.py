@@ -26,7 +26,11 @@ def main():
         { "role": "system", "content": SYSTEM_PROMPT},
         { "role": "user", "content": args.user_prompt}
     ]
-    response = client.chat.completions.create(model="openrouter/free", messages=messages)
+    response = client.chat.completions.create(
+        model="openrouter/free", 
+        messages=messages, 
+        temperature=0
+    )
     if response is None: raise Exception("Error! No usage reported by AI model.")
 
     if args.verbose:
