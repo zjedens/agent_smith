@@ -3,12 +3,32 @@ import os
 import subprocess
 from pprint import pprint
 
+schema_run_python_file = {
+    "type": "function",
+    "function": {
+        "name": "run_python_file",
+        "description": "Run a python script (.py).  Assume the file exists.  Allows to pass in cmd args to script",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "file_path": {
+                    "type": "string",
+                    "description": "The python file (.py) to run as a script"
+                },
+                "args": {
+                    "type": "array",
+                    "description": "A list of (string) arguments to be passed to the executing Python script (i.e. file_path.py)"
+                }
+            },
+            "required": ["file_path", "args"]
+        }
+    }
+}
+
 def run_python_file(working_directory: str, file_path: str, args: list[str] | None = None) -> str:
     try:
         absolute_working_dir = os.path.abspath(working_directory)
         full_file_path: str = os.path.normpath(os.path.join(absolute_working_dir, file_path))
-        # dirs = [f'cwd={absolute_working_dir}', f'.py={full_file_path}']
-        # pprint(dirs)
 
         in_working_path: bool = os.path.commonpath([absolute_working_dir, full_file_path]) == absolute_working_dir
         is_file = os.path.isfile(full_file_path)

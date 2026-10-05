@@ -2,6 +2,28 @@
 import os
 from pprint import pprint
 
+schema_write_file = {
+    "type": "function",
+    "function": {
+        "name": "write_file",
+        "description": "Write new contents to a file within the working directory",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "file_path": {
+                    "type": "string",
+                    "description": "Directory path to list files from, relative to the working directory (default is the working directory itself)"
+                },
+                "content": {
+                    "type": "string",
+                    "description": "New content to write to specified file"
+                }
+            },
+            "required": ["file_path", "content"]
+        }
+    }
+}
+
 def write_file(working_directory: str, file_path: str, content: str) -> str:
     try:
         absolute_working_dir = os.path.abspath(working_directory)

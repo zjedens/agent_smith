@@ -2,6 +2,24 @@
 import os
 import config
 
+schema_get_file_content = {
+    "type": "function",
+    "function": {
+        "name": "get_file_content",
+        "description": "Returns an existing file's contents as a string",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "file_path": {
+                    "type": "string",
+                    "description": "File in working directory for which to fetch contents"
+                }
+            },
+            "required": ["file_path"]
+        }
+    }
+}
+
 def get_file_content(working_directory: str, file_path: str) -> str:
     try:
         full_file_path = os.path.join(working_directory, file_path)

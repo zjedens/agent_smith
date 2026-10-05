@@ -46,7 +46,7 @@ def main():
         for tool_call in msg.tool_calls:
             func_args = json.loads(tool_call.function.arguments or "{}")
             print(f"Calling function: {tool_call.function.name}({func_args})")
-    else:
+    #else:
         print(msg.content)
 
 
