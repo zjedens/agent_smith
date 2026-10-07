@@ -28,32 +28,42 @@ def main():
         { "role": "system", "content": SYSTEM_PROMPT},
         { "role": "user", "content": args.user_prompt}
     ]
-    response = client.chat.completions.create(
-        model="openrouter/free", 
-        messages=messages, 
-        temperature=0,
-        tools=available_functions
-    )
-    if response is None: raise Exception("Error! No usage reported by AI model.")
 
-    if args.verbose:
-        print(f"User prompt: {args.user_prompt}")
-        print(f"Prompt tokens: {response.usage.prompt_tokens}")
-        print(f"Response tokens: {response.usage.completion_tokens}")
+    for _ in range(20):
+        response = client.chat.completions.create(
+            model="openrouter/free", 
+            messages=messages, 
+            temperature=0,
+            tools=available_functions
+        )
+        if response is None: raise Exception("Error! No usage reported by AI model.")
 
-    msg = response.choices[0].message
-    if msg.tool_calls is not None:
-        for tool_call in msg.tool_calls:
-            func_args = json.loads(tool_call.function.arguments or "{}")
-            
-            print(f"Calling function: {tool_call.function.name}({func_args})")
-            result = call_function(tool_call, args.verbose)
-            if len(result['content']) == 0: raise Exception("Error: content was empty")
 
-            if args.verbose:
-                print(f"-> {result['content']}")
-    #else:
-        print(msg.content)
+        if args.verbose:
+            print(f"User prompt: {args.user_prompt}")
+            print(f"Prompt tokens: {response.usage.prompt_tokens}")
+            print(f"Response tokens: {response.usage.completion_tokens}")
+
+        msg = response.choices[0].message
+        messages.append(msg)
+        if msg.tool_calls is not None:
+            for tool_call in msg.tool_calls:
+                func_args = json.loads(tool_call.function.arguments or "{}")
+                
+                print(f"Calling function: {tool_call.function.name}({func_args})")
+                result = call_function(tool_call, args.verbose)
+                if len(result['content']) == 0: raise Exception("Error: content was empty")
+
+                if args.verbose:
+                    print(f"-> {result['content']}")
+
+                messages.append(result)
+        else:
+            print(msg.content)
+            exit(0)
+
+    print("Error: maximum iterations reached")
+    exit(1)
 
 
 if __name__ == "__main__":
